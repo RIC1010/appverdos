@@ -17,68 +17,78 @@ const Lead=()=>{
     const [actividades, setActividades]=useState([])
     const [descripcion, setDes]= useState("")
     const [activity, setActivity]= useState("")
-    const [txtEstado, setTxtEstado]= useState("")
+    const [txtEstado, setTxtEstado]= useState(0)
     const [txtFecha, setFecha]= useState("")
     const [email, setEmail]=useState("")
+    const [estados, setEstados]=useState([])
+    const [metodos, setMetodos]=useState([])
+    const [estadosl, setEstadosL]=useState([])
+    const [estadosa, setEstadosa]=useState([])
+    const [prioridades, setPrioridades]=useState([])
     useEffect(async () => {
-        console.log("obt: ", obtenerKeyLead())
         const x= obtenerKeyLead()
         const datos= x.split(",")
         console.log(datos[0])
-        setEmail(datos[0])
         //----------------------
         let response= await fetch("/api/leads/[id]", {
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              email: datos[0],
-              fecha: datos[1],
-              servicio: datos[2]
+              id: datos[0]
             }),
           })
-
-        //---------------------
-        //let response = await fetch("/api/leads")
         const data = await response.json()
         console.log("data: ", data.lead[0])
         setLista(data.lead[0])
 
         //---------------------------------------
-        let response2= await fetch("/api/actividades", {
+        let response2 = await fetch("/api/actividades", {
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              tipo: "Lead",
-              email: datos[0]
+                id: datos[0]
             }),
-          })
-          const data2 = await response2.json()
-        console.log("data: ", data2.actividades)
+        })
+        const data2 = await response2.json()
         setActividades(data2.actividades)
+        //---------------------------
+        let response3 = await fetch("/api/estados")
+        const data3 = await response3.json()
+        setEstados(data3.estados)
+        //-------------------------
+        let response4 = await fetch("/api/metodos")
+        const data4 = await response4.json()
+        setMetodos(data4.metodos)
+        //----------obtener estadoslead---------------
+        let response5 = await fetch("/api/estadol")
+        const data5 = await response5.json()
+        console.log("estadosl: ", data5.estados)
+        setEstadosL(data5.estados)
+        //-----obtener prioridades---------
+        let response6 = await fetch("/api/prioridades")
+        const data6 = await response6.json()
+        setPrioridades(data6.prioridades)
+        //-----obtener estados actividad---
+        let response7 = await fetch("/api/estadosa")
+        const data7 = await response7.json()
+        setEstadosa(data7.estados)
     }, [])
-    /*useEffect(()=>{
-        setListaActividades("obtenerActividad()")
-    }, [])*/
     const butNuevoOnClick = (pos) => {
-        //setModoFormulario("nuevo")
         setDebeMostrarModal(true)
-        //setPosicion(pos)
     }
 
     const onModalClose = () => {
         setDebeMostrarModal(false)
     }
     const butNuevoOnClick4 = (descripcion) => {
-        //setModoFormulario("nuevo")
         const des=descripcion.split(",")
         console.log("datos: ", des)
         setDes(des[0])
         setActivity(des[1])
         setFecha(des[2])
         setDebeMostrarModal4(true)
-        //setPosicion(pos)
     }
     const but=(descripcion)=>{
         const des=descripcion.split(",")
@@ -88,9 +98,6 @@ const Lead=()=>{
         setDebeMostrarModal4(false)
     }
     const butNuevoOnClick2 = (des) => {
-        //setModoFormulario("nuevo")
-        //location.href="/lead"
-        //mos(des)
         setDes(des)
         setDebeMostrarModal2(true)
     }
@@ -98,58 +105,40 @@ const Lead=()=>{
     const onModalClose2 = () => {
         setDebeMostrarModal2(false)
     }
-    const eliminarActividad=(estado)=>{
-        const dt=estado.split(",")
-        /*setDes(dt[0])
-        setActivity(dt[1])
-        setTxtEstado(dt[3])
-        setFecha(dt[2])
-        *///setDebeMostrarModal3(true)
-        fetch("/api/leads", {
+    const eliminarActividad=(id)=>{
+        fetch("/api/actividades", {
             method: 'DELETE',
             mode: 'cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              tipo: "Lead",
-              email: email,
-              fecha: dt[2]
+              id: id
             }),
         })
         location.href="/lead"
 
     }
     const butNuevoOnClick3 = (estado) => {
-        const dt=estado.split(",")
-        setDes(dt[0])
-        setActivity(dt[1])
-        setTxtEstado(dt[3])
-        setFecha(dt[2])
+        setTxtEstado(estado)
         setDebeMostrarModal3(true)
-        //setPosicion(pos)
     }
-
+    const [idact, setidact]=useState(0)
+    const editarIdAct=(id)=>{
+        setidact(id)
+    }
     const onModalClose3 = () => {
         setDebeMostrarModal3(false)
     }
-    const actualizar=(txtPrioridad, txtEstadoL)=>{
-        var daylead=new Date()
-            const lfechas=lista[7].split("T")
-            daylead=lfechas[0]
-            console.log(daylead)
-            console.log(txtPrioridad)
-            console.log(txtEstadoL)
-            fetch('/api/leads/[id]', {
-                method: 'PUT',
-                mode: 'cors',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    email: lista[2],
-                    lead_fecha: daylead,
-                    servicio:lista[3],
-                    prioridad: txtPrioridad,
-                    estado: txtEstadoL
-                }),
-            })
+    const actualizar = (txtPrioridad, txtEstadoL) => {
+        fetch('/api/leads/[id]', {
+            method: 'PUT',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: lista[0],
+                prioridad: parseInt(txtPrioridad),
+                estado: parseInt(txtEstadoL)
+            }),
+        })
     }
     const listaClases=["nav-link","nav-link active","nav-link","nav-link"]
     return <div className="container">
@@ -162,7 +151,7 @@ const Lead=()=>{
         </nav>
         <div className="card mt-2 bg-secondary bg-opacity-10">
             <div className="row mt-4 mb-4">
-                <Cabecera nombre={lista[5]} editar={butNuevoOnClick2} editarLead={butNuevoOnClick2}></Cabecera>
+                <Cabecera nombre={lista[6]} editar={butNuevoOnClick2} editarLead={butNuevoOnClick2}></Cabecera>
                 <InfoType datosLead={lista}></InfoType>   
             </div>
             <ButtonLink nombre="Marcar lead como ganado" editar={butNuevoOnClick} color="btn btn-primary" modo="cliente" />
@@ -174,12 +163,12 @@ const Lead=()=>{
                 <ButtonLink nombre="+ Agregar" editar={butNuevoOnClick} color="btn btn-success bg-opacity-25" modo="cliente" />    
             </div>
             <div data-spy="scroll" class="scrollspy-example mt-4" data-target="#list-example" data-offset="0">
-                <Listado elimAct={eliminarActividad} actividades={actividades} editarAct={butNuevoOnClick3} editar2={but} editar={butNuevoOnClick4} editarLead={butNuevoOnClick}></Listado>
+                <Listado editarId={editarIdAct} elimAct={eliminarActividad} actividades={actividades} editarAct={butNuevoOnClick3} editar2={but} editar={butNuevoOnClick4} editarLead={butNuevoOnClick}></Listado>
             </div>
             <PlantillaModal nombre={activity} descrip={descripcion} mostrar={debeMostrarModal4} ocultar={onModalClose4} modo="desactivity"></PlantillaModal>
-            <PlantillaModal lis={lista} mostrar={debeMostrarModal} ocultar={onModalClose} modo="agregar"></PlantillaModal>
-            <PlantillaModal onActualizarLead={actualizar} lis={lista}  mostrar={debeMostrarModal2} ocultar={onModalClose2} modo="estadoPrioridad"></PlantillaModal>
-            <PlantillaModal lis={lista} fecha={txtFecha} estado={txtEstado} mostrar={debeMostrarModal3} ocultar={onModalClose3} modo="actividad"></PlantillaModal>
+            <PlantillaModal metodos={metodos} estados={estados} lis={lista} mostrar={debeMostrarModal} ocultar={onModalClose} modo="agregar"></PlantillaModal>
+            <PlantillaModal prioridades={prioridades} estados={estadosl} onActualizarLead={actualizar} lis={lista}  mostrar={debeMostrarModal2} ocultar={onModalClose2} modo="estadoPrioridad"></PlantillaModal>
+            <PlantillaModal ide={idact} estados={estadosa} lis={lista} fecha={txtFecha} estado={parseInt(txtEstado)} mostrar={debeMostrarModal3} ocultar={onModalClose3} modo="actividad"></PlantillaModal>
         </div>
     </div>
 }

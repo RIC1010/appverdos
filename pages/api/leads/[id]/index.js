@@ -3,7 +3,7 @@ import { elimAct, modificarLead, obtenerLead } from "../../../../dao/leads"
 const leadHandler =async (req, res)=>{
     if (req.method == "POST") {
         const data = req.body
-        const lead = await obtenerLead(data.email, data.fecha, data.servicio)
+        const lead = await obtenerLead(data.id)
         res.json({
             msg: "",
             lead : lead

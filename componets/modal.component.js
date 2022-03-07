@@ -8,6 +8,7 @@ const PlantillaModal=(props)=>{
     const [txtTelefono, setTxtTelefono] = useState("")
     const [txtEmpresa, setTxtEmpresa] = useState("")
     const [txtCargo, setTxtCargo] = useState("")
+    const [listaIdServicios, setListaIdServicios] = useState([])
     const txtNOMBREonChange = (event) => {
         setTxtNombre(event.target.value)
     }
@@ -79,25 +80,16 @@ const PlantillaModal=(props)=>{
         const fechas=txtDate.split("T")
         var day=new Date()
         day= fechas[0]+' '+fechas[1]
-        console.log(day)
-        console.log(props.lis[7])
-        var daylead=new Date()
-        const lfechas=props.lis[7].split("T")
-        daylead=lfechas[0]
-        console.log(daylead)
         fetch('/api/actividades', {
             method: 'PUT',
             mode: 'cors',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                email: props.lis[2],
-                lead_fecha: daylead,
-                servicio:props.lis[3],
+                id_lead: props.lis[0],
                 fecha:day,
                 descripcion: txtDescrip,
-                metodo:txtTipo,
-                tipo:"Lead",
-                estado: txtEstado
+                metodo:parseInt(txtTipo),
+                estado: parseInt(txtEstado)
             }),
         })
         location.href="/lead"
@@ -113,32 +105,20 @@ const PlantillaModal=(props)=>{
         console.log("estado: ", props.estado)
     },)*/
     const txtEstadoaOnChange=(event)=>{
-        console.log(event.target.value)
         setTxtEstadoA(event.target.value)
         setTxtbtn("btn btn-primary")
     }
     const editarEstadoLead=()=>{
-        var daylead=new Date()
-        const fe=props.fecha
-        const lfechas=fe.split("T")
-        console.log("fecha: ", props.fecha)
-        daylead=lfechas[0] +''+ lfechas[1]
         fetch('/api/actividades/[id]', {
             method: 'PUT',
             mode: 'cors',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                email: props.lis[2],
-                tipo: "Lead",
-                fecha:daylead,
-                estado:txtEstadoA
+                id: props.ide,
+                estado: parseInt(txtEstadoA)
             }),
         })
-        console.log(props.lis[2])
-        console.log("Lead")
-        console.log(daylead)
-        console.log(txtEstadoA)
-        //location.href="/lead"
+        location.href="/lead"
     }
 
     if (props.modo == "agregar") {
@@ -163,20 +143,28 @@ const PlantillaModal=(props)=>{
                     </div>
                     <div>
                         <label for="" className="form-label">Tipo de actividad</label>
-                        <select onChange={txtTipoOnChange} className="form-select" aria-label="Default select example">
-                            <option selected>Elija una actividad</option>
-                            <option value="Llamada">Llamada</option>
-                            <option value="Reunión">Reunión</option>
-                            <option value="Email">E-mail</option>
-                            <option value="Demo">Demo</option>
+                        <select className="form-select" size="2" defaultValue={listaIdServicios}
+                            onChange={txtTipoOnChange} multiple>
+                            {
+                                props.metodos.map((metodo) => {
+                                    return <option value={metodo.id} key={metodo.id}>
+                                        {metodo.nombre}
+                                    </option>
+                                })
+                            }
                         </select>
                     </div>
                     <div>
                         <label for="" className="form-label">Estado</label>
-                        <select onChange={txtEstadoOnChange} className="form-select" aria-label="Default select example">
-                            <option selected>Elija un estado</option>
-                            <option value="Realizado">Realizado</option>
-                            <option value="Planificado">Planificado</option>
+                        <select className="form-select" size="2" defaultValue={listaIdServicios}
+                            onChange={txtEstadoOnChange} multiple>
+                            {
+                                props.estados.map((estado) => {
+                                    return <option value={estado.id} key={estado.id}>
+                                        {estado.nombre}
+                                    </option>
+                                })
+                            }
                         </select>
                     </div>
                 </form>
@@ -204,18 +192,28 @@ const PlantillaModal=(props)=>{
                 <form>
                     <div>
                         <label for="" className="form-label">Prioridad</label>
-                        <select defaultValue={txtPrioridad} onChange={txtPrioridadOnChange} className="form-select">
-                            <option value={1}>Baja</option>
-                            <option value={2}>Media</option>
-                            <option value={3}>Alta</option>
+                        <select className="form-select" size="2" defaultValue={txtPrioridad}
+                            onChange={txtPrioridadOnChange}>
+                            {
+                                props.prioridades.map((prioridad) => {
+                                    return <option value={prioridad.id} key={prioridad.id}>
+                                        {prioridad.nombre}
+                                    </option>
+                                })
+                            }
                         </select>
                     </div>
                     <div>
                         <label for="" className="form-label">Estado</label>
-                        <select defaultValue={txtEstadoL}  onChange={txtEstadolOnChange} className="form-select" aria-label="Default select example">
-                            <option value="Registrado">Registrado</option>
-                            <option value="Propuesta">Propuesta</option>
-                            <option value="Etapa final">Etapa final</option>
+                        <select className="form-select" size="2" defaultValue={txtEstadoL}
+                            onChange={txtEstadolOnChange}>
+                            {
+                                props.estados.map((estado) => {
+                                    return <option value={estado.id} key={estado.id}>
+                                        {estado.nombre}
+                                    </option>
+                                })
+                            }
                         </select>
                     </div>
                 </form>
@@ -233,36 +231,40 @@ const PlantillaModal=(props)=>{
             </Modal.Header>
             <Modal.Body>
                 <form>
-                    <div className="input-group-sm mb-2">
+                    <div className="input-group-sm mb-1">
                         <label for="" className="form-label" >Nombre</label>
                         <input type="text" placeholder="Nombre" className="form-control" onChange={txtNOMBREonChange} />
                     </div>
-                    <div className="input-group-sm mb-2">
+                    <div className="input-group-sm mb-1">
                         <label for="" className="form-label" >Apellido</label>
                         <input type="text" placeholder="Apellido" className="form-control" onChange={txtApellidoonChange} />
                     </div>
-                    <div className="input-group-sm mb-2">
+                    <div className="input-group-sm mb-1">
                         <label for="" className="form-label">CORREO</label>
                         <input type="text" placeholder="@EMAIL.COM" className="form-control" onChange={txtEMAILonChange} />
                     </div>
-                    <div className="input-group-sm mb-2">
-                        <label for="" className="form-label">Servicio</label>
-                        <select className="form-select" onChange={txtServicioOnChange} aria-label="Default select example">
-                            <option selected>Elige un servicio</option>
-                            <option value="Publicidad">Publicidad</option>
-                            <option value="Brand Design">Brand Design</option>
-                            <option value="Social Media">Social Media</option>
+                    <div className="input-group-sm mb-1">
+                        <label  className="form-label">Servicio</label>
+                        <select className="form-select" size="2" defaultValue={listaIdServicios}
+                            onChange={txtServicioOnChange} multiple>
+                            {
+                                props.servicios.map((servicio) => {
+                                    return <option value={servicio.id} key={servicio.id}>
+                                        {servicio.nombre}
+                                    </option>
+                                })
+                            }
                         </select>
                     </div>
-                    <div className="input-group-sm mb-2">
+                    <div className="input-group-sm mb-1">
                         <label for="" className="form-label" >Teléfono</label>
                         <input type="text" className="form-control" onChange={txtTelefonoOnChange} />
                     </div>
-                    <div className="input-group-sm mb-2">
+                    <div className="input-group-sm mb-1">
                         <label for="" className="form-label" >Empresa a la cual perteneces</label>
                         <input type="text" className="form-control" onChange={txtEmpresaOnChange} />
                     </div>
-                    <div className="input-group-sm mb-2">
+                    <div className="input-group-sm">
                         <label for="" className="form-label" >Cargo en empresa</label>
                         <input type="text" className="form-control" onChange={txtCargoOnChange} />
                     </div>
@@ -284,9 +286,15 @@ const PlantillaModal=(props)=>{
                 <form>
                     <div>
                         <label for="" className="form-label">Estado</label>
-                        <select defaultValue={props.estado}  onChange={txtEstadoaOnChange} className="form-select" >
-                            <option value="Realizado">Realizado</option>
-                            <option value="Planificado">Planificado</option>
+                        <select className="form-select" size="2" defaultValue={props.estado}
+                            onChange={txtEstadoaOnChange} >
+                            {
+                                props.estados.map((estado) => {
+                                    return <option value={estado.id} key={estado.id}>
+                                        {estado.nombre}
+                                    </option>
+                                })
+                            }
                         </select>
                     </div>
                 </form>

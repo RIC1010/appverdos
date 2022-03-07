@@ -7,11 +7,21 @@ import PlantillaModal from "../componets/modal.component"
 const InicioLeads=()=>{
     const listaClases=["nav-link","nav-link active","nav-link","nav-link"]
     const [lista, setLista] = useState([])
+    const [listaServicios, setServicios]= useState([]);
+
+    const obtenerServiciosHTTP= async()=>{
+        let response = await fetch("/api/servicios")
+        const data = await response.json()
+        return data
+    }
     useEffect(async () => {
         let response = await fetch("/api/leads")
         const data = await response.json()
         console.log(data)
         setLista(data.leads)
+
+        const dataServicios = await obtenerServiciosHTTP()
+        setServicios(dataServicios.servicios)
     }, [])
     const [debeMostrarModal2, setDebeMostrarModal2] = useState(false)
     /*
@@ -24,12 +34,6 @@ const InicioLeads=()=>{
     }
     const insertarLead=(txtNombre, txtApellido, 
         txtEmail, txtServicio,txtTelefono, txtEmpresa, txtCargo)=>{
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
-        var yyyy = today.getFullYear();
-        today = yyyy + '/' + mm + '/' + dd;
-        //------------------------
         fetch('/api/externos', {
             method: 'PUT',
             mode: 'cors',
@@ -38,13 +42,13 @@ const InicioLeads=()=>{
                 nombre: txtNombre,
                 apellido: txtApellido,
                 email: txtEmail,
-                servicio:txtServicio,
+                id_servicio:parseInt(txtServicio),
                 telefono: parseInt(txtTelefono),
                 empresa:txtEmpresa,
-                fecha:today,
                 cargo:txtCargo,
-                estado:"Registrado",
-                prioridad: 1
+                id_usuario:100,
+                id_estado:100,
+                id_prioridad: 100
             }),
         })
         location.href="/inicioleads"
@@ -82,7 +86,7 @@ const InicioLeads=()=>{
             </div>
         </div>
         <ListadoLeads leads={lista}></ListadoLeads>
-        <PlantillaModal onInsertar={insertarLead} mostrar={debeMostrarModal2} ocultar={onModalClose2} modo="lead"></PlantillaModal>
+        <PlantillaModal servicios={listaServicios} onInsertar={insertarLead} mostrar={debeMostrarModal2} ocultar={onModalClose2} modo="lead"></PlantillaModal>
     </div> 
 }
 export default InicioLeads

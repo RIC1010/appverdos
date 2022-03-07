@@ -1,8 +1,5 @@
-const setkeyLead=(email, fecha, servicio)=>{
-    const dato=[
-        email,
-        fecha, servicio
-    ]
+const setkeyLead=(id)=>{
+    const dato=[id]
     localStorage.setItem("datos", dato)
 }
 const obtenerKeyLead=()=>{

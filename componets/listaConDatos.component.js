@@ -11,18 +11,16 @@ const Listado = (props) => {
         props.editarLead()
     }
     const butOnclickEdit=(event)=>{
-        const estado= event.target.id
-        console.log("estadx: ", event.target.id)
-        const dt=estado.split(",")
-        props.editarAct(estado)
-        //props.editar2(event.target.id)
+        const data= event.target.id
+        const datos=data.split(",")
+        const estado= datos[0]
+        const id= datos[1]
+        props.editarAct(parseInt(estado))
+        props.editarId(parseInt(id))
     }
     const butOnclickElim=(event)=>{
-        const estado= event.target.id
-        console.log("estadx: ", event.target.id)
-        const dt=estado.split(",")
-        props.elimAct(estado)
-        //props.editar2(event.target.id)
+        const id= event.target.id
+        props.elimAct(id)
         
     }
     return <div className="row container">
@@ -47,8 +45,8 @@ const Listado = (props) => {
                                     <td>{actividad.fecha}</td>
                                     <td>{actividad.estado}</td>
                                     <td>
-                                        <button id={actividad.descripcion+","+actividad.metodo+","+actividad.fecha+","+actividad.estado} className="btn btn-warning me-1 mt-1" onClick={butOnclickEdit}>editar</button>
-                                        <button id={actividad.descripcion+","+actividad.metodo+","+actividad.fecha+","+actividad.estado} className="btn btn-danger mt-1" onClick={butOnclickElim}>eliminar</button>
+                                        <button id={[actividad.id_estado, actividad.id]} className="btn btn-warning me-1 mt-1" onClick={butOnclickEdit}>editar</button>
+                                        <button id={actividad.id} className="btn btn-danger mt-1" onClick={butOnclickElim}>eliminar</button>
                                         
                                     </td>    
                                 

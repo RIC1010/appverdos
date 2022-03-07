@@ -3,30 +3,18 @@ import ButtonLink from "./botonEnlace.component"
 import { setkeyLead } from "../dao/variable"
 const ListadoLeads = (props) => {
     const butOnClick=(event)=>{
-      console.log(event.target.id)
-      const identificador=event.target.id.split(",")
-      console.log(identificador[0])
-      console.log(identificador[1])
-      console.log(identificador[2])
-      
       fetch("/api/leads", {
         method: 'DELETE',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: identificador[0],
-          fecha: identificador[1],
-          servicio: identificador[2]
+          id: event.target.id
         }),
       })
       location.href="/inicioleads"
     }
     const detallesOnClick=(event)=>{
-        console.log("entra")
-        console.log(event.target.id)
-        const identificador=event.target.id.split(",")
-        console.log(identificador)
-        setkeyLead(identificador[0], identificador[1], identificador[2])
+        setkeyLead(event.target.id)
         location.href="/lead"
     }
     return <div className="row container">
@@ -54,12 +42,11 @@ const ListadoLeads = (props) => {
                                     <h6>Contacto: {lead.contacto}</h6>
                                     <h6>Servicio: {lead.servicio}</h6>
                                     <p class="card-text">Estado: {lead.estado}</p>
-                                    <p class="card-text">Prioridad: {prio}</p>
-                                    <p class="card-text"><small class="text-muted">Fecha de registro: {lead.fecha}</small></p>
+                                    <p class="card-text">Prioridad: {lead.prioridad}</p>
                                 </div>
                                 <div className="col">
-                                        <button id={[lead.email, lead.fecha, lead.servicio]} className="btn btn-primary mt-5 me-2" onClick={detallesOnClick}>Detalles</button>
-                                        <button id={[lead.email, lead.fecha, lead.servicio]} className="btn btn-danger mt-5" onClick={butOnClick}>Eliminar</button>
+                                        <button id={lead.id} className="btn btn-primary mt-5 me-2" onClick={detallesOnClick}>Detalles</button>
+                                        <button id={lead.id} className="btn btn-danger mt-5" onClick={butOnClick}>Eliminar</button>
                                 </div>
                               </div>
                             </div>

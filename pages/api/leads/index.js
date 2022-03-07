@@ -8,9 +8,7 @@ const leadsHandler= async (req, res)=>{
             leads: leads
         })
     }else if(req.method=="DELETE"){
-        console.log(req.body.email)
-        await eliminarLead(req.body.email, 
-        req.body.fecha, req.body.servicio)
+        await eliminarLead(req.body.id)
         
     }else if(req.method=='PUT'){
         const data = JSON.parse(req.body)
